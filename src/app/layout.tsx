@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: '数独 — たきせあきひこ Edition',
+  title: 'ナンプレ',
   description: '論理のみで解ける本格数独。ヒントで技法を学べるプロ級パズルアプリ。',
   manifest: '/manifest.json',
   appleWebApp: {

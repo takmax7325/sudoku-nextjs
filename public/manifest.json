@@ -1,6 +1,6 @@
 {
-  "name": "数独 — たきせあきひこ Edition",
-  "short_name": "数独",
+  "name": "ナンプレ",
+  "short_name": "ナンプレ",
   "description": "論理のみで解ける本格数独。ヒントで技法を学べるプロ級パズルアプリ。",
   "start_url": "/",
   "display": "standalone",

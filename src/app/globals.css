@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: #f1f5f9;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', sans-serif;
+  overscroll-behavior: none;
+  height: 100%;
+  min-height: 100%;
+}
+
+/* スクロールバー */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+
+/* タッチ操作 */
+button,
+[role="button"] {
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* アニメーション定義 */
+@keyframes pop {
+  0% { transform: scale(0.7); opacity: 0; }
+  60% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse-hint {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(167,139,250,0.7); }
+  50% { box-shadow: 0 0 0 6px rgba(167,139,250,0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-pop {
+  animation: pop 0.18s ease-out forwards;
+}
+
+/* Tailwind 標準外スケール */
+.active\:scale-97:active { transform: scale(0.97); }
+.active\:scale-98:active { transform: scale(0.98); }
+.hover\:scale-101:hover  { transform: scale(1.01); }
+
+.animate-pulse-hint {
+  animation: pulse-hint 1.2s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.28s ease-out;
+}
+
+/* グリッドのサイズをビューポートに合わせる */
+.sudoku-grid-wrapper {
+  width: min(100vw - 2rem, 504px);
+  height: min(100vw - 2rem, 504px);
+}
+
+/* ── クリア演出アニメーション ── */
+
+/* 紙吹雪が落ちる */
+@keyframes confetti-fall {
+  0%   { transform: translateY(-20px) rotate(0deg);   opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+/* クリア文字がポンと現れる */
+@keyframes clear-pop {
+  0%   { transform: scale(0.4) translateY(20px); opacity: 0; }
+  60%  { transform: scale(1.08) translateY(-4px); opacity: 1; }
+  100% { transform: scale(1) translateY(0);       opacity: 1; }
+}
+
+/* 絵文字がくるっと回る */
+@keyframes emoji-spin {
+  0%   { transform: rotate(-20deg) scale(0.5); }
+  60%  { transform: rotate(15deg)  scale(1.25); }
+  100% { transform: rotate(0deg)   scale(1); }
+}
+
+/* 星が1つずつ現れる */
+@keyframes star-appear {
+  0%   { transform: scale(0) rotate(-30deg); opacity: 0; }
+  70%  { transform: scale(1.4) rotate(10deg); }
+  100% { transform: scale(1)   rotate(0deg);  opacity: 1; }
+}
+
+/* ボタンがふわっと出る */
+@keyframes fade-in-up {
+  0%   { transform: translateY(24px); opacity: 0; }
+  100% { transform: translateY(0);    opacity: 1; }
+}
+
+/* オーバーレイ背景がフェードイン */
+@keyframes overlay-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

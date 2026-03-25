@@ -493,7 +493,7 @@ export const useGameStore = create<GameStore>()(
       name: 'sudoku-pwa-storage',
       // Set は JSON でシリアライズできないためカスタムストレージで変換
       storage: {
-        getItem: (name) => {
+        getItem: (name: string) => {
           try {
             if (typeof window === 'undefined') return null;
             const str = localStorage.getItem(name);
@@ -523,22 +523,22 @@ export const useGameStore = create<GameStore>()(
             return null;
           }
         },
-        setItem: (name, value) => {
+        setItem: (name: string, value: unknown) => {
           if (typeof window === 'undefined') return;
           // Set を Array に変換してシリアライズ
-          const serialize = (v: any): any => {
+          const serialize = (v: unknown): unknown => {
             if (v instanceof Set) return [...v];
             if (Array.isArray(v)) return v.map(serialize);
             if (v && typeof v === 'object') {
-              const out: any = {};
-              for (const k of Object.keys(v)) out[k] = serialize(v[k]);
+              const out: Record<string, unknown> = {};
+              for (const k of Object.keys(v)) out[k] = serialize((v as Record<string, unknown>)[k]);
               return out;
             }
             return v;
           };
           localStorage.setItem(name, JSON.stringify(serialize(value)));
         },
-        removeItem: (name) => {
+        removeItem: (name: string) => {
           if (typeof window !== 'undefined') localStorage.removeItem(name);
         },
       },

@@ -60,7 +60,7 @@ function HomeScreen() {
             className="font-extrabold tracking-tight text-white"
             style={{ fontSize: 'clamp(36px, 10vw, 56px)', textShadow: '0 0 40px rgba(125,211,252,0.3)' }}
           >
-            数独
+            ナンプレ
           </h1>
         </div>
         <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest text-center mb-1">

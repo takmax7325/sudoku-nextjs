@@ -67,6 +67,22 @@ function formatDate(date: Date): string {
 }
 
 // ────────────────────────────────────────────────────────────
+// セーブデータ型（難易度ごと）
+// ────────────────────────────────────────────────────────────
+
+interface SavedGameState {
+  board: CellState[][];
+  solution: number[][];
+  puzzle: number[][];
+  timer: number;
+  timerWasRunning: boolean;
+  hintCount: number;
+  history: CellState[][][];
+  historyIndex: number;
+  isComplete: boolean;
+}
+
+// ────────────────────────────────────────────────────────────
 // State 型
 // ────────────────────────────────────────────────────────────
 
@@ -78,6 +94,9 @@ interface GameStore {
   difficulty: Difficulty;
   isComplete: boolean;
   isGenerating: boolean;
+
+  // ── 難易度別セーブデータ
+  savedGames: Partial<Record<Difficulty, SavedGameState>>;
 
   // ── 選択・入力
   selectedCell: [number, number] | null;
@@ -111,6 +130,7 @@ interface GameStore {
 
   // ── アクション
   newGame: (difficulty: Difficulty) => void;
+  resumeGame: (difficulty: Difficulty) => void;
   goHome: () => void;
   toggleTheme: () => void;
   selectCell: (row: number, col: number) => void;
@@ -158,12 +178,41 @@ export const useGameStore = create<GameStore>()(
       showStats: false,
       showDifficultyPicker: false,
       theme: 'dark' as const,
+      savedGames: {},
 
       // ────────────────────────────────────────────────────
       // newGame
       // ────────────────────────────────────────────────────
       newGame: (difficulty) => {
-        set({ isGenerating: true });
+        // 別難易度に切り替える場合は現在のゲームを保存
+        const {
+          puzzle: curPuzzle, isComplete: curComplete,
+          difficulty: curDiff, board: curBoard, solution: curSolution,
+          timer: curTimer, isTimerRunning: curTimerRunning,
+          hintCount: curHintCount, history: curHistory,
+          historyIndex: curHistoryIndex, savedGames,
+        } = get();
+        const hasCurPuzzle = curPuzzle.some(row => row.some(v => v !== 0));
+        const newSavedGames = { ...savedGames };
+
+        if (hasCurPuzzle && !curComplete && difficulty !== curDiff) {
+          // 別難易度への切り替え → 現在のゲームを保存
+          newSavedGames[curDiff] = {
+            board: cloneBoard(curBoard),
+            solution: curSolution,
+            puzzle: curPuzzle,
+            timer: curTimer,
+            timerWasRunning: curTimerRunning,
+            hintCount: curHintCount,
+            history: curHistory.map(snap => cloneBoard(snap)),
+            historyIndex: curHistoryIndex,
+            isComplete: false,
+          };
+        }
+        // 選択した難易度の古いセーブは削除（新しいゲーム開始）
+        delete newSavedGames[difficulty];
+
+        set({ isGenerating: true, savedGames: newSavedGames });
 
         // Web Worker があれば使いたいが、ここでは setTimeout で非同期化
         setTimeout(() => {
@@ -189,6 +238,37 @@ export const useGameStore = create<GameStore>()(
             historyIndex: 0,
           });
         }, 0);
+      },
+
+      // ────────────────────────────────────────────────────
+      // resumeGame（難易度別セーブから復元）
+      // ────────────────────────────────────────────────────
+      resumeGame: (difficulty) => {
+        const { savedGames } = get();
+        const saved = savedGames[difficulty];
+        if (!saved) return;
+
+        const newSavedGames = { ...savedGames };
+        delete newSavedGames[difficulty];
+
+        set({
+          board: cloneBoard(saved.board),
+          solution: saved.solution,
+          puzzle: saved.puzzle,
+          difficulty,
+          timer: saved.timer,
+          isTimerRunning: false, // タップで再開
+          timerWasRunning: saved.timerWasRunning,
+          hintCount: saved.hintCount,
+          history: saved.history.map(snap => cloneBoard(snap)),
+          historyIndex: saved.historyIndex,
+          isComplete: saved.isComplete,
+          screen: 'game',
+          selectedCell: null,
+          currentHint: null,
+          pencilMode: false,
+          savedGames: newSavedGames,
+        });
       },
 
       // ────────────────────────────────────────────────────
@@ -482,9 +562,35 @@ export const useGameStore = create<GameStore>()(
       },
 
       goHome: () => {
-        const { isTimerRunning } = get();
+        const {
+          isTimerRunning, puzzle, isComplete, difficulty,
+          board, solution, timer, hintCount, history,
+          historyIndex, savedGames,
+        } = get();
+        const hasPuzzle = puzzle.some(row => row.some(v => v !== 0));
+        const newSavedGames = { ...savedGames };
+
+        if (hasPuzzle && !isComplete) {
+          // 未完了ゲームを保存
+          newSavedGames[difficulty] = {
+            board: cloneBoard(board),
+            solution,
+            puzzle,
+            timer,
+            timerWasRunning: isTimerRunning,
+            hintCount,
+            history: history.map(snap => cloneBoard(snap)),
+            historyIndex,
+            isComplete: false,
+          };
+        } else if (isComplete) {
+          // 完了済みはセーブから削除
+          delete newSavedGames[difficulty];
+        }
+
         set({
           screen: 'home',
+          savedGames: newSavedGames,
           timerWasRunning: isTimerRunning, // ホーム移動直前の状態を記録
           isTimerRunning: false,           // ホーム中はタイマー停止
           currentHint: null,
@@ -524,6 +630,30 @@ export const useGameStore = create<GameStore>()(
                 )
               );
             }
+            // savedGames の Set を復元
+            if (parsed?.state?.savedGames) {
+              for (const diff of Object.keys(parsed.state.savedGames)) {
+                const sg = parsed.state.savedGames[diff];
+                if (sg?.board) {
+                  sg.board = sg.board.map((row: any[]) =>
+                    row.map((cell: any) => ({
+                      ...cell,
+                      pencilMarks: new Set<number>(cell.pencilMarks ?? []),
+                    }))
+                  );
+                }
+                if (sg?.history) {
+                  sg.history = sg.history.map((snap: any[]) =>
+                    snap.map((row: any[]) =>
+                      row.map((cell: any) => ({
+                        ...cell,
+                        pencilMarks: new Set<number>(cell.pencilMarks ?? []),
+                      }))
+                    )
+                  );
+                }
+              }
+            }
             return parsed;
           } catch {
             return null;
@@ -561,6 +691,7 @@ export const useGameStore = create<GameStore>()(
         statistics: state.statistics,
         isComplete: state.isComplete,
         theme: state.theme,
+        savedGames: state.savedGames,
       }),
     } as any
   )

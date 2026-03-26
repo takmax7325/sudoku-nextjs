@@ -86,10 +86,7 @@ const THEME = {
 } as const;
 
 function HomeScreen() {
-  const { newGame, isGenerating, setShowStats, puzzle, timerWasRunning, difficulty, theme, toggleTheme } = useGameStore();
-
-  // ゲーム途中かどうか（全空白でなければ継続可能）
-  const hasSavedGame = puzzle.some(row => row.some(v => v !== 0));
+  const { newGame, resumeGame, isGenerating, setShowStats, theme, toggleTheme, savedGames } = useGameStore();
   const t = THEME[theme];
 
   return (
@@ -158,58 +155,95 @@ function HomeScreen() {
         {DIFFICULTIES.map((d, i) => {
           const color = DIFFICULTY_COLORS[d];
           const stars = DIFFICULTY_STARS[d];
+          const showContinue = !!(savedGames[d] && !savedGames[d]?.isComplete);
           return (
-            <button
+            <div
               key={d}
-              onClick={() => newGame(d)}
-              disabled={isGenerating}
-              className="group relative w-full flex items-center gap-4 px-5 py-4 rounded-2xl
-                transition-all duration-200 active:scale-97 hover:scale-101
-                disabled:opacity-50 disabled:cursor-not-allowed animate-slide-up"
-              style={{
-                background: t.cardBg,
-                border: `1px solid ${color}40`,
-                boxShadow: `0 4px 24px ${color}10`,
-                animationDelay: `${i * 60}ms`,
-                animationFillMode: 'both',
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.borderColor = `${color}90`;
-                (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 32px ${color}30`;
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.borderColor = `${color}40`;
-                (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 24px ${color}10`;
-              }}
+              className="relative w-full animate-slide-up"
+              style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'both' }}
             >
-              {/* 左: カラードット + 難易度名 */}
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div
-                  className="w-3 h-3 rounded-full flex-shrink-0"
-                  style={{ background: color, boxShadow: `0 0 8px ${color}` }}
-                />
-                <div className="text-left min-w-0">
-                  <div className="font-bold" style={{ fontSize: 'clamp(14px, 3.5vw, 16px)', color: t.cardTextColor }}>
-                    {DIFFICULTY_LABELS[d]}
-                  </div>
-                  <div className="truncate" style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', color: t.cardDescColor }}>
-                    {DIFFICULTY_DESC[d]}
+              {/* 続きからボタン：絶対位置でカード左側にはみ出す */}
+              {showContinue && (
+                <button
+                  onClick={() => resumeGame(d)}
+                  className="absolute flex flex-col items-center justify-center gap-1 rounded-xl
+                    font-semibold transition-all active:scale-95 hover:brightness-110"
+                  style={{
+                    left: '-60px',
+                    top: 0,
+                    bottom: 0,
+                    width: '54px',
+                    background: t.actionCardBg,
+                    border: `1px solid ${color}50`,
+                    color: t.continueTextColor,
+                    fontSize: '10px',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '7px', height: '7px', borderRadius: '50%',
+                      background: color, boxShadow: `0 0 5px ${color}`,
+                    }}
+                  />
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                  </svg>
+                  <span>続きから</span>
+                </button>
+              )}
+
+              {/* 難易度カード：常にフル幅・同一サイズ */}
+              <button
+                onClick={() => newGame(d)}
+                disabled={isGenerating || showContinue}
+                className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl
+                  transition-all duration-200
+                  disabled:cursor-not-allowed"
+                style={{
+                  background: t.cardBg,
+                  border: `1px solid ${color}40`,
+                  boxShadow: `0 4px 24px ${color}10`,
+                  opacity: showContinue ? 0.45 : 1,
+                }}
+                onMouseEnter={e => {
+                  if (showContinue) return;
+                  (e.currentTarget as HTMLElement).style.borderColor = `${color}90`;
+                  (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 32px ${color}30`;
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.borderColor = `${color}40`;
+                  (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 24px ${color}10`;
+                }}
+              >
+                {/* 左: カラードット + 難易度名 */}
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div
+                    className="w-3 h-3 rounded-full flex-shrink-0"
+                    style={{ background: color, boxShadow: `0 0 8px ${color}` }}
+                  />
+                  <div className="text-left min-w-0">
+                    <div className="font-bold" style={{ fontSize: 'clamp(14px, 3.5vw, 16px)', color: t.cardTextColor }}>
+                      {DIFFICULTY_LABELS[d]}
+                    </div>
+                    <div className="truncate" style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', color: t.cardDescColor }}>
+                      {DIFFICULTY_DESC[d]}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* 右: スター */}
-              <div className="flex gap-0.5 flex-shrink-0">
-                {Array.from({ length: 5 }).map((_, si) => (
-                  <span
-                    key={si}
-                    style={{ color: si < stars ? color : t.cardStarEmpty, fontSize: '14px' }}
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
-            </button>
+                {/* 右: スター */}
+                <div className="flex gap-0.5 flex-shrink-0">
+                  {Array.from({ length: 5 }).map((_, si) => (
+                    <span
+                      key={si}
+                      style={{ color: si < stars ? color : t.cardStarEmpty, fontSize: '14px' }}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+              </button>
+            </div>
           );
         })}
       </div>
@@ -227,38 +261,8 @@ function HomeScreen() {
         </div>
       )}
 
-      {/* 継続 / 統計ボタン */}
-      <div className="flex gap-3 w-full max-w-sm">
-        {hasSavedGame && (
-          <button
-            onClick={() => useGameStore.setState({ screen: 'game', isTimerRunning: timerWasRunning })}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl
-              font-semibold transition-all active:scale-95 hover:brightness-110"
-            style={{
-              background: t.actionCardBg,
-              border: `1px solid ${DIFFICULTY_COLORS[difficulty]}50`,
-              color: t.continueTextColor,
-              fontSize: 'clamp(12px, 3vw, 14px)',
-            }}
-          >
-            {/* 難易度カラーボール */}
-            <div
-              style={{
-                width: '10px',
-                height: '10px',
-                borderRadius: '50%',
-                background: DIFFICULTY_COLORS[difficulty],
-                boxShadow: `0 0 6px ${DIFFICULTY_COLORS[difficulty]}`,
-                flexShrink: 0,
-              }}
-            />
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <polygon points="5 3 19 12 5 21 5 3" />
-            </svg>
-            続きから
-          </button>
-        )}
-
+      {/* 統計ボタン */}
+      <div className="flex w-full max-w-sm">
         <button
           onClick={() => setShowStats(true)}
           className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl

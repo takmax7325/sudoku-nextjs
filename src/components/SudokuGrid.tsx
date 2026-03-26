@@ -6,6 +6,7 @@
 
 import React, { useCallback, useRef, useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
+import { GAME_THEME } from '@/lib/theme';
 import type { CellHighlight } from '@/hooks/useGame';
 
 interface SudokuGridProps {
@@ -13,7 +14,8 @@ interface SudokuGridProps {
 }
 
 export default function SudokuGrid({ getCellHighlight }: SudokuGridProps) {
-  const { board, solution, selectCell, inputNumber, currentHint, isComplete } = useGameStore();
+  const { board, selectCell, currentHint, isComplete, theme } = useGameStore();
+  const gt = GAME_THEME[theme];
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [pressedCell, setPressedCell] = useState<[number, number] | null>(null);
 
@@ -37,7 +39,6 @@ export default function SudokuGrid({ getCellHighlight }: SudokuGridProps) {
         clearTimeout(longPressTimer.current);
         longPressTimer.current = null;
       }
-      const { pencilMode } = useGameStore.getState();
       selectCell(row, col);
     },
     [selectCell]
@@ -65,8 +66,11 @@ export default function SudokuGrid({ getCellHighlight }: SudokuGridProps) {
       <div
         className="grid grid-cols-9 gap-0 rounded-xl overflow-hidden"
         style={{
-          border: '3px solid #ffffff',
-          boxShadow: '0 0 40px rgba(0,0,0,0.5)',
+          border: `3px solid ${gt.gridBorder}`,
+          boxShadow: theme === 'dark'
+            ? '0 0 40px rgba(0,0,0,0.5)'
+            : '0 4px 24px rgba(30,41,59,0.15)',
+          transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
         }}
       >
         {board.map((row, r) =>
@@ -82,6 +86,7 @@ export default function SudokuGrid({ getCellHighlight }: SudokuGridProps) {
                 cell={cell}
                 highlight={highlight}
                 isHint={!!isHint}
+                theme={theme}
                 onPointerDown={handlePointerDown}
                 onPointerUp={handlePointerUp}
                 onPointerLeave={handlePointerLeave}
@@ -109,6 +114,7 @@ interface CellProps {
   };
   highlight: CellHighlight;
   isHint: boolean;
+  theme: 'dark' | 'light';
   onPointerDown: (r: number, c: number) => void;
   onPointerUp: (r: number, c: number) => void;
   onPointerLeave: () => void;
@@ -120,27 +126,29 @@ const Cell = React.memo(function Cell({
   cell,
   highlight,
   isHint,
+  theme,
   onPointerDown,
   onPointerUp,
   onPointerLeave,
 }: CellProps) {
+  const gt = GAME_THEME[theme];
   const hasPencil = cell.value === null && cell.pencilMarks.size > 0;
 
   // ボックス境界のボーダー
-  const borderRight = (col + 1) % 3 === 0 && col < 8 ? '3px solid #ffffff' : '1.5px solid rgba(255,255,255,0.3)';
-  const borderBottom = (row + 1) % 3 === 0 && row < 8 ? '3px solid #ffffff' : '1.5px solid rgba(255,255,255,0.3)';
+  const borderRight = (col + 1) % 3 === 0 && col < 8 ? `3px solid ${gt.cellBorderBold}` : `1.5px solid ${gt.cellBorderLight}`;
+  const borderBottom = (row + 1) % 3 === 0 && row < 8 ? `3px solid ${gt.cellBorderBold}` : `1.5px solid ${gt.cellBorderLight}`;
 
   // 背景色
-  let bg = '#1e293b'; // default surface
-  if (highlight === 'selected') bg = '#1e3a8a';
-  else if (highlight === 'hint') bg = '#3b0764';
-  else if (highlight === 'sameNumber') bg = '#1d3461';
-  else if (highlight === 'peer') bg = '#1e2d40';
+  let bg: string = gt.cellDefault;
+  if (highlight === 'selected') bg = gt.cellSelected;
+  else if (highlight === 'hint') bg = gt.cellHint;
+  else if (highlight === 'sameNumber') bg = gt.cellSameNumber;
+  else if (highlight === 'peer') bg = gt.cellPeer;
 
   // テキスト色
-  let textColor = '#f1f5f9';
+  let textColor: string = gt.cellTextGiven;
   if (cell.isError) textColor = '#f87171';
-  else if (!cell.isGiven) textColor = '#7dd3fc';
+  else if (!cell.isGiven) textColor = gt.cellTextUser;
 
   return (
     <div
@@ -155,6 +163,7 @@ const Cell = React.memo(function Cell({
         borderRight,
         borderBottom,
         WebkitTapHighlightColor: 'transparent',
+        transition: 'background 0.15s ease',
       }}
       onPointerDown={() => onPointerDown(row, col)}
       onPointerUp={() => onPointerUp(row, col)}
@@ -188,7 +197,7 @@ const Cell = React.memo(function Cell({
 
       {/* ペンシルマーク */}
       {hasPencil && (
-        <PencilMarks marks={cell.pencilMarks} />
+        <PencilMarks marks={cell.pencilMarks} color={gt.pencilMarkColor} />
       )}
     </div>
   );
@@ -198,7 +207,7 @@ const Cell = React.memo(function Cell({
 // PencilMarks
 // ────────────────────────────────────────────────────────────
 
-function PencilMarks({ marks }: { marks: Set<number> }) {
+function PencilMarks({ marks, color }: { marks: Set<number>; color: string }) {
   return (
     <div
       className="grid grid-cols-3 grid-rows-3 w-full h-full p-0.5"
@@ -207,7 +216,7 @@ function PencilMarks({ marks }: { marks: Set<number> }) {
         <div
           key={n}
           className="flex items-center justify-center"
-          style={{ fontSize: 'clamp(6px, 1.8vw, 9px)', color: '#94a3b8', lineHeight: 1 }}
+          style={{ fontSize: 'clamp(6px, 1.8vw, 9px)', color, lineHeight: 1 }}
         >
           {marks.has(n) ? n : ''}
         </div>

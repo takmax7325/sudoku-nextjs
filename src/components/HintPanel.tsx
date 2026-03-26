@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { useGameStore } from '@/store/gameStore';
-import { DIFFICULTY_COLORS } from '@/lib/types';
+import { GAME_THEME } from '@/lib/theme';
 import type { Technique } from '@/lib/types';
 
 const TECHNIQUE_COLORS: Record<Technique, string> = {
@@ -32,7 +32,8 @@ const TECHNIQUE_LEVEL: Record<Technique, string> = {
 };
 
 export default function HintPanel() {
-  const { currentHint, clearHint, requestHint, hintCount, isComplete, isGenerating } = useGameStore();
+  const { currentHint, clearHint, requestHint, hintCount, isComplete, isGenerating, theme } = useGameStore();
+  const gt = GAME_THEME[theme];
 
   return (
     <div className="w-full">
@@ -42,7 +43,7 @@ export default function HintPanel() {
           disabled={isComplete || isGenerating}
           className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
             transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed
-            hover:brightness-125 font-semibold"
+            hover:brightness-110 font-semibold"
           style={{
             background: 'linear-gradient(135deg, #3730a3, #7c3aed)',
             color: '#fff',
@@ -65,9 +66,10 @@ export default function HintPanel() {
         <div
           className="w-full rounded-xl p-4 animate-fade-in"
           style={{
-            background: 'rgba(15,23,42,0.95)',
+            background: gt.hintPanelBg,
             border: `1px solid ${TECHNIQUE_COLORS[currentHint.technique] ?? '#7c3aed'}40`,
             boxShadow: `0 0 20px ${TECHNIQUE_COLORS[currentHint.technique] ?? '#7c3aed'}20`,
+            transition: 'background 0.3s ease',
           }}
         >
           {/* ヘッダー */}
@@ -96,7 +98,7 @@ export default function HintPanel() {
 
             <button
               onClick={clearHint}
-              className="p-1 rounded-lg transition-all hover:bg-white/10 active:scale-90"
+              className="p-1 rounded-lg transition-all hover:bg-black/10 active:scale-90"
               aria-label="Close hint"
             >
               <svg
@@ -104,7 +106,7 @@ export default function HintPanel() {
                 height="16"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#64748b"
+                stroke={gt.modalSubTextColor}
                 strokeWidth="2"
                 strokeLinecap="round"
               >
@@ -117,7 +119,7 @@ export default function HintPanel() {
           {/* 説明文 */}
           <p
             className="leading-relaxed"
-            style={{ color: '#cbd5e1', fontSize: 'clamp(11px, 2.8vw, 13px)' }}
+            style={{ color: gt.hintPanelText, fontSize: 'clamp(11px, 2.8vw, 13px)' }}
           >
             {currentHint.description}
           </p>
@@ -154,14 +156,14 @@ export default function HintPanel() {
           {currentHint.value !== undefined && (
             <button
               onClick={() => {
-                const { requestHint: _, clearHint, revealCell, selectCell } = useGameStore.getState();
+                const { clearHint, revealCell, selectCell } = useGameStore.getState();
                 const [r, c] = currentHint.affectedCells[0];
                 selectCell(r, c);
                 revealCell();
                 clearHint();
               }}
               className="mt-3 w-full py-2 rounded-lg text-xs font-semibold
-                transition-all hover:brightness-125 active:scale-95"
+                transition-all hover:brightness-110 active:scale-95"
               style={{
                 background: 'rgba(74,222,128,0.15)',
                 color: '#4ade80',

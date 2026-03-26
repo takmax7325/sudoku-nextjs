@@ -6,6 +6,8 @@
 
 import React from 'react';
 import { useGameStore } from '@/store/gameStore';
+import { GAME_THEME } from '@/lib/theme';
+import type { GameThemeTokens } from '@/lib/theme';
 import type { Difficulty } from '@/lib/types';
 import { DIFFICULTY_LABELS, DIFFICULTY_COLORS } from '@/lib/types';
 
@@ -25,14 +27,16 @@ export default function Controls() {
     hintCount,
     setShowStats,
     setShowDifficultyPicker,
+    theme,
   } = useGameStore();
+  const gt = GAME_THEME[theme];
 
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < history.length - 1;
 
   return (
     <div className="flex flex-col gap-3 w-full">
-      {/* 上段: ペンシル / Undo / Redo / 消去 */}
+      {/* 上段: Undo / Redo / ペンシル */}
       <div className="flex items-center justify-center gap-2">
         {/* Undo */}
         <ControlButton
@@ -40,6 +44,7 @@ export default function Controls() {
           disabled={!canUndo}
           label="戻る"
           icon={<UndoIcon />}
+          gt={gt}
         />
 
         {/* Redo */}
@@ -48,6 +53,7 @@ export default function Controls() {
           disabled={!canRedo}
           label="進む"
           icon={<RedoIcon />}
+          gt={gt}
         />
 
         {/* ペンシルモード */}
@@ -57,6 +63,7 @@ export default function Controls() {
           label={pencilMode ? 'ペンON' : 'ペン'}
           icon={<PencilIcon />}
           activeColor="#7c3aed"
+          gt={gt}
         />
 
         {/* リセット */}
@@ -66,22 +73,26 @@ export default function Controls() {
           }}
           label="リセット"
           icon={<ResetIcon />}
+          gt={gt}
         />
       </div>
 
-      {/* 下段: 新しいゲーム / 統計 */}
+      {/* 下段: 新しいゲーム / 消去 / 統計 */}
       <div className="flex items-center justify-center gap-2">
         {/* 難易度 + 新規ゲーム */}
         <button
           onClick={() => setShowDifficultyPicker(true)}
           disabled={isGenerating}
           className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold
-            transition-all active:scale-95 hover:brightness-125 disabled:opacity-50"
+            transition-all active:scale-95 hover:brightness-105 disabled:opacity-50"
           style={{
-            background: 'linear-gradient(135deg, #0f172a, #1e293b)',
+            background: theme === 'dark'
+              ? 'linear-gradient(135deg, #0f172a, #1e293b)'
+              : `${DIFFICULTY_COLORS[difficulty]}10`,
             border: `1px solid ${DIFFICULTY_COLORS[difficulty]}60`,
             color: DIFFICULTY_COLORS[difficulty],
             fontSize: 'clamp(12px, 3vw, 14px)',
+            transition: 'background 0.2s ease',
           }}
         >
           {isGenerating ? (
@@ -101,12 +112,13 @@ export default function Controls() {
         <button
           onClick={eraseCell}
           className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold
-            transition-all active:scale-95 hover:brightness-125"
+            transition-all active:scale-95 hover:brightness-105"
           style={{
-            background: 'rgba(30,41,59,0.8)',
-            border: '1px solid rgba(71,85,105,0.4)',
-            color: '#94a3b8',
+            background: gt.actionBg,
+            border: `1px solid ${gt.actionBorder}`,
+            color: gt.actionText,
             fontSize: 'clamp(12px, 3vw, 14px)',
+            transition: 'background 0.2s ease, color 0.2s ease',
           }}
           aria-label="消去"
         >
@@ -118,12 +130,13 @@ export default function Controls() {
         <button
           onClick={() => setShowStats(true)}
           className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold
-            transition-all active:scale-95 hover:bg-white/10"
+            transition-all active:scale-95 hover:brightness-105"
           style={{
-            background: 'rgba(30,41,59,0.8)',
-            border: '1px solid rgba(71,85,105,0.4)',
-            color: '#94a3b8',
+            background: gt.actionBg,
+            border: `1px solid ${gt.actionBorder}`,
+            color: gt.actionText,
             fontSize: 'clamp(12px, 3vw, 14px)',
+            transition: 'background 0.2s ease, color 0.2s ease',
           }}
         >
           <StatsIcon />
@@ -145,6 +158,7 @@ interface ControlButtonProps {
   disabled?: boolean;
   active?: boolean;
   activeColor?: string;
+  gt: GameThemeTokens;
 }
 
 function ControlButton({
@@ -154,6 +168,7 @@ function ControlButton({
   disabled = false,
   active = false,
   activeColor = '#7dd3fc',
+  gt,
 }: ControlButtonProps) {
   return (
     <button
@@ -161,12 +176,13 @@ function ControlButton({
       disabled={disabled}
       className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl
         transition-all active:scale-90 disabled:opacity-30 disabled:cursor-not-allowed
-        hover:bg-white/10"
+        hover:brightness-105"
       style={{
-        color: active ? activeColor : '#94a3b8',
-        background: active ? `${activeColor}15` : 'rgba(30,41,59,0.6)',
-        border: `1px solid ${active ? `${activeColor}40` : 'rgba(71,85,105,0.3)'}`,
+        color: active ? activeColor : gt.controlText,
+        background: active ? `${activeColor}15` : gt.controlBg,
+        border: `1px solid ${active ? `${activeColor}40` : gt.controlBorder}`,
         minWidth: '52px',
+        transition: 'background 0.2s ease, color 0.2s ease',
       }}
       aria-label={label}
     >
@@ -257,7 +273,8 @@ function SpinIcon() {
 const DIFFICULTIES: Difficulty[] = ['beginner', 'intermediate', 'advanced', 'expert', 'extreme'];
 
 export function DifficultyPicker() {
-  const { showDifficultyPicker, setShowDifficultyPicker, newGame, difficulty } = useGameStore();
+  const { showDifficultyPicker, setShowDifficultyPicker, newGame, difficulty, theme } = useGameStore();
+  const gt = GAME_THEME[theme];
 
   if (!showDifficultyPicker) return null;
 
@@ -269,10 +286,19 @@ export function DifficultyPicker() {
     >
       <div
         className="w-full max-w-sm rounded-2xl p-6 animate-slide-up"
-        style={{ background: '#0f172a', border: '1px solid #334155' }}
+        style={{
+          background: gt.modalBg,
+          border: `1px solid ${gt.modalBorder}`,
+          transition: 'background 0.3s ease',
+        }}
         onClick={e => e.stopPropagation()}
       >
-        <h2 className="text-lg font-bold text-white mb-4 text-center">難易度を選択</h2>
+        <h2
+          className="text-lg font-bold mb-4 text-center"
+          style={{ color: gt.modalTitleColor }}
+        >
+          難易度を選択
+        </h2>
 
         <div className="flex flex-col gap-2">
           {DIFFICULTIES.map(d => (
@@ -283,10 +309,10 @@ export function DifficultyPicker() {
                 setShowDifficultyPicker(false);
               }}
               className="flex items-center justify-between px-4 py-3 rounded-xl
-                transition-all active:scale-98 hover:brightness-125"
+                transition-all active:scale-98 hover:brightness-105"
               style={{
-                background: d === difficulty ? `${DIFFICULTY_COLORS[d]}20` : 'rgba(30,41,59,0.8)',
-                border: `1px solid ${d === difficulty ? DIFFICULTY_COLORS[d] : 'rgba(71,85,105,0.4)'}`,
+                background: d === difficulty ? `${DIFFICULTY_COLORS[d]}20` : gt.modalCardBg,
+                border: `1px solid ${d === difficulty ? DIFFICULTY_COLORS[d] : gt.modalCardBorder}`,
               }}
             >
               <span className="font-bold" style={{ color: DIFFICULTY_COLORS[d] }}>
@@ -299,8 +325,9 @@ export function DifficultyPicker() {
 
         <button
           onClick={() => setShowDifficultyPicker(false)}
-          className="mt-4 w-full py-2 rounded-xl text-sm text-slate-400 hover:text-slate-300
-            transition-all hover:bg-white/5"
+          className="mt-4 w-full py-2 rounded-xl text-sm
+            transition-all hover:brightness-95"
+          style={{ color: gt.modalCancelText }}
         >
           キャンセル
         </button>

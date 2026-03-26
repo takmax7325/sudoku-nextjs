@@ -6,9 +6,11 @@
 
 import React, { useCallback } from 'react';
 import { useGameStore } from '@/store/gameStore';
+import { GAME_THEME } from '@/lib/theme';
 
 export default function NumberPad() {
-  const { board, selectedCell, solution, inputNumber, pencilMode } = useGameStore();
+  const { board, selectedCell, inputNumber, pencilMode, theme } = useGameStore();
+  const gt = GAME_THEME[theme];
 
   // 各数字の残り入力可能回数を計算
   const numCounts = React.useMemo(() => {
@@ -52,18 +54,17 @@ export default function NumberPad() {
                 relative flex flex-col items-center justify-center rounded-lg
                 transition-all duration-100 active:scale-90 select-none
                 font-bold
-                ${isComplete ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:brightness-125 active:brightness-150'}
+                ${isComplete ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:brightness-105 active:brightness-110'}
                 ${isActive ? 'ring-2 ring-violet-400' : ''}
               `}
               style={{
                 width: 'clamp(30px, 8.5vw, 52px)',
                 height: 'clamp(46px, 12vw, 70px)',
-                background: isActive
-                  ? 'rgba(109,40,217,0.4)'
-                  : 'rgba(30,41,59,0.9)',
-                border: '1px solid rgba(71,85,105,0.6)',
+                background: isActive ? gt.numPadActiveBg : gt.numPadBg,
+                border: `1px solid ${gt.numPadBorder}`,
                 fontSize: 'clamp(16px, 4.5vw, 26px)',
-                color: '#f1f5f9',
+                color: gt.numPadText,
+                transition: 'background 0.2s ease, color 0.2s ease, border-color 0.2s ease',
               }}
               aria-label={`Input ${n}, ${remaining} remaining`}
             >
@@ -72,7 +73,6 @@ export default function NumberPad() {
           );
         })}
       </div>
-
     </div>
   );
 }

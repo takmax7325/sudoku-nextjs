@@ -102,6 +102,9 @@ interface GameStore {
   // ── 画面
   screen: 'home' | 'game';
 
+  // ── テーマ
+  theme: 'dark' | 'light';
+
   // ── モーダル
   showStats: boolean;
   showDifficultyPicker: boolean;
@@ -109,6 +112,7 @@ interface GameStore {
   // ── アクション
   newGame: (difficulty: Difficulty) => void;
   goHome: () => void;
+  toggleTheme: () => void;
   selectCell: (row: number, col: number) => void;
   inputNumber: (num: number) => void;
   eraseCell: () => void;
@@ -153,6 +157,7 @@ export const useGameStore = create<GameStore>()(
       statistics: { ...DEF_STATS },
       showStats: false,
       showDifficultyPicker: false,
+      theme: 'dark' as const,
 
       // ────────────────────────────────────────────────────
       // newGame
@@ -488,6 +493,7 @@ export const useGameStore = create<GameStore>()(
 
       setShowStats: (v) => set({ showStats: v }),
       setShowDifficultyPicker: (v) => set({ showDifficultyPicker: v }),
+      toggleTheme: () => set(s => ({ theme: s.theme === 'dark' ? 'light' : 'dark' })),
     }),
     {
       name: 'sudoku-pwa-storage',
@@ -554,6 +560,7 @@ export const useGameStore = create<GameStore>()(
         historyIndex: state.historyIndex,
         statistics: state.statistics,
         isComplete: state.isComplete,
+        theme: state.theme,
       }),
     } as any
   )

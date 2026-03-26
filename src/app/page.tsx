@@ -91,7 +91,7 @@ function HomeScreen() {
 
   return (
     <main
-      className="relative min-h-screen flex flex-col items-center justify-center px-4 pb-8 animate-fade-in"
+      className="relative min-h-screen flex flex-col items-center justify-center pr-4 pl-4 pb-8 animate-fade-in"
       style={{ background: t.bg, transition: 'background 0.3s ease' }}
     >
       {/* テーマ切替ボタン（右上） */}
@@ -130,7 +130,7 @@ function HomeScreen() {
       </div>
 
       {/* 難易度選択 */}
-      <div className="w-full max-w-sm flex flex-col gap-3 mb-6">
+      <div className="w-full max-w-sm flex flex-col mb-6">
         {/* タイトル：難易度セクションの直上 */}
         <div className="flex flex-col items-center mb-3">
           <h1
@@ -152,6 +152,8 @@ function HomeScreen() {
           難易度を選んでスタート
         </p>
 
+        {/* カードリストは左に64px確保して続きからボタンがはみ出ても画面内に収まるようにする */}
+        <div className="w-full flex flex-col gap-3" style={{ paddingLeft: '64px' }}>
         {DIFFICULTIES.map((d, i) => {
           const color = DIFFICULTY_COLORS[d];
           const stars = DIFFICULTY_STARS[d];
@@ -162,7 +164,7 @@ function HomeScreen() {
               className="relative w-full animate-slide-up"
               style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'both' }}
             >
-              {/* 続きからボタン：絶対位置でカード左側にはみ出す */}
+              {/* 続きからボタン：絶対位置でカード左側（パディング内）にはみ出す */}
               {showContinue && (
                 <button
                   onClick={() => resumeGame(d)}
@@ -246,6 +248,7 @@ function HomeScreen() {
             </div>
           );
         })}
+        </div>{/* /カードリスト paddingLeft wrapper */}
       </div>
 
       {/* 生成中インジケーター */}

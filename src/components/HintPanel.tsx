@@ -64,7 +64,7 @@ export default function HintPanel() {
                 className="font-bold"
                 style={{
                   color: TECHNIQUE_COLORS[currentHint.technique] ?? '#a78bfa',
-                  fontSize: 'clamp(12px, 3vw, 14px)',
+                  fontSize: 'clamp(16px, 4vw, 20px)',
                 }}
               >
                 {currentHint.technique}
@@ -94,7 +94,7 @@ export default function HintPanel() {
           {/* 説明文 */}
           <p
             className="leading-relaxed"
-            style={{ color: gt.hintPanelText, fontSize: 'clamp(11px, 2.8vw, 13px)' }}
+            style={{ color: gt.hintPanelText, fontSize: 'clamp(14px, 3.5vw, 17px)' }}
           >
             {currentHint.description}
           </p>

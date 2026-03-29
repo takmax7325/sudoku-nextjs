@@ -422,15 +422,6 @@ function GameScreen() {
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 21h6M12 3a7 7 0 0 1 4.47 12.5c-.58.56-1.47 1.5-1.47 2.5H9c0-1-.89-1.94-1.47-2.5A7 7 0 0 1 12 3z" />
           </svg>
-          {hintCount > 0 && (
-            <span
-              className="absolute -top-1 -right-1 flex items-center justify-center
-                w-4 h-4 rounded-full text-white font-bold"
-              style={{ fontSize: '9px', background: '#7c3aed', lineHeight: 1 }}
-            >
-              {hintCount}
-            </span>
-          )}
         </button>
 
         {/* テーマ切替ボタン（右端） */}

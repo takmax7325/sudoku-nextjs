@@ -149,7 +149,7 @@ export default function HintPanel() {
             </button>
           )}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

@@ -299,7 +299,7 @@ function GameScreen() {
   const game = useGame();
   const {
     difficulty, isGenerating, goHome, theme, toggleTheme,
-    eraseCell, setShowStats, setShowDifficultyPicker,
+    resetPuzzle, setShowStats, setShowDifficultyPicker,
     requestHint, hintCount, isComplete,
   } = useGameStore();
   const gt = GAME_THEME[theme];
@@ -368,9 +368,9 @@ function GameScreen() {
             )}
           </button>
 
-          {/* 消去 */}
+          {/* リセット */}
           <button
-            onClick={eraseCell}
+            onClick={() => { if (confirm('このパズルをリセットしますか？')) resetPuzzle(); }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold
               transition-all active:scale-95 hover:brightness-105"
             style={{
@@ -379,12 +379,12 @@ function GameScreen() {
               color: gt.actionText,
               fontSize: '13px',
             }}
-            aria-label="消去"
+            aria-label="リセット"
           >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 20H7L3 16l10-10 7 7-2.5 2.5" /><path d="M6.0001 17.0001L17 6" />
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 .49-4.5" />
             </svg>
-            消去
+            リセット
           </button>
 
           {/* 統計 */}

@@ -19,7 +19,7 @@ export default function Controls() {
     redo,
     historyIndex,
     history,
-    resetPuzzle,
+    eraseCell,
     theme,
   } = useGameStore();
   const gt = GAME_THEME[theme];
@@ -59,13 +59,11 @@ export default function Controls() {
           gt={gt}
         />
 
-        {/* リセット */}
+        {/* 消去 */}
         <ControlButton
-          onClick={() => {
-            if (confirm('このパズルをリセットしますか？')) resetPuzzle();
-          }}
-          label="リセット"
-          icon={<ResetIcon />}
+          onClick={eraseCell}
+          label="消去"
+          icon={<EraseIcon />}
           gt={gt}
         />
       </div>

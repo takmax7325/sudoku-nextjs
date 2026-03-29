@@ -5,6 +5,60 @@
 :root {
   --bg: #0f172a;
   --surface: #1e293b;
+
+  /* ── レスポンシブスケーリング (ゲーム画面) ── */
+  --grid-size: min(calc(100vw - 2rem), 504px);
+  --cell-size: calc(var(--grid-size) / 9);
+  --numpad-gap: 4px;
+  --numpad-btn-w: clamp(30px, 8.5vw, 52px);
+  --numpad-btn-h: clamp(46px, 12vw, 70px);
+  --numpad-font: clamp(16px, 4.5vw, 26px);
+  --control-min-w: 52px;
+  --control-font: clamp(9px, 2vw, 11px);
+
+  /* ── ホーム画面スケーリング ── */
+  --home-max-w: min(calc(100vw - 2rem), 384px);
+  --home-title-fs: clamp(36px, 10vw, 56px);
+  --home-label-fs: 0.75rem;
+  --home-card-pl: 64px;
+  --home-continue-left: -60px;
+  --home-continue-w: 54px;
+  --home-card-name-fs: clamp(14px, 3.5vw, 16px);
+  --home-card-desc-fs: clamp(10px, 2.5vw, 12px);
+  --home-star-fs: 14px;
+  --home-stats-fs: clamp(12px, 3vw, 14px);
+}
+
+/* sm以上: gap を広げる */
+@media (min-width: 640px) {
+  :root {
+    --numpad-gap: 8px;
+  }
+}
+
+/* iPad mini 5 以上 (768px+) : 全要素を自動拡大 */
+@media (min-width: 768px) {
+  :root {
+    /* ゲーム画面 */
+    --grid-size: min(calc(100vw - 4rem), 580px);
+    --numpad-btn-w: calc((var(--grid-size) - var(--numpad-gap) * 8) / 9);
+    --numpad-btn-h: calc(var(--numpad-btn-w) * 1.38);
+    --numpad-font: calc(var(--numpad-btn-w) * 0.5);
+    --control-min-w: 68px;
+    --control-font: 13px;
+
+    /* ホーム画面 */
+    --home-max-w: 580px;
+    --home-title-fs: 68px;
+    --home-label-fs: 0.875rem;
+    --home-card-pl: 80px;
+    --home-continue-left: -74px;
+    --home-continue-w: 68px;
+    --home-card-name-fs: 20px;
+    --home-card-desc-fs: 14px;
+    --home-star-fs: 18px;
+    --home-stats-fs: 16px;
+  }
 }
 
 * {
@@ -85,10 +139,10 @@ button,
   animation: slide-up 0.28s ease-out;
 }
 
-/* グリッドのサイズをビューポートに合わせる */
+/* グリッドのサイズをビューポートに合わせる (CSS変数で自動スケール) */
 .sudoku-grid-wrapper {
-  width: min(100vw - 2rem, 504px);
-  height: min(100vw - 2rem, 504px);
+  width: var(--grid-size);
+  height: var(--grid-size);
 }
 
 /* ── クリア演出アニメーション ── */

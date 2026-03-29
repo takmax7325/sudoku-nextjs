@@ -58,11 +58,11 @@ export default function NumberPad() {
                 ${isActive ? 'ring-2 ring-violet-400' : ''}
               `}
               style={{
-                width: 'clamp(30px, 8.5vw, 52px)',
-                height: 'clamp(46px, 12vw, 70px)',
+                width: 'var(--numpad-btn-w)',
+                height: 'var(--numpad-btn-h)',
                 background: isActive ? gt.numPadActiveBg : gt.numPadBg,
                 border: `1px solid ${gt.numPadBorder}`,
-                fontSize: 'clamp(16px, 4.5vw, 26px)',
+                fontSize: 'var(--numpad-font)',
                 color: gt.numPadText,
                 transition: 'background 0.2s ease, color 0.2s ease, border-color 0.2s ease',
               }}

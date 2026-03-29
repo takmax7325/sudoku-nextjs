@@ -130,13 +130,13 @@ function HomeScreen() {
       </div>
 
       {/* 難易度選択 */}
-      <div className="w-full max-w-sm flex flex-col mb-6">
+      <div className="w-full flex flex-col mb-6 md:mb-10" style={{ maxWidth: 'var(--home-max-w)' }}>
         {/* タイトル：難易度セクションの直上 */}
-        <div className="flex flex-col items-center mb-3">
+        <div className="flex flex-col items-center mb-3 md:mb-5">
           <h1
             className="font-extrabold tracking-tight"
             style={{
-              fontSize: 'clamp(36px, 10vw, 56px)',
+              fontSize: 'var(--home-title-fs)',
               color: t.titleColor,
               textShadow: t.titleShadow,
               transition: 'color 0.3s ease',
@@ -146,14 +146,14 @@ function HomeScreen() {
           </h1>
         </div>
         <p
-          className="text-xs font-semibold uppercase tracking-widest text-center mb-1"
-          style={{ color: t.labelColor, transition: 'color 0.3s ease' }}
+          className="font-semibold uppercase tracking-widest text-center mb-1"
+          style={{ fontSize: 'var(--home-label-fs)', color: t.labelColor, transition: 'color 0.3s ease' }}
         >
           難易度を選んでスタート
         </p>
 
-        {/* カードリストは左に64px確保して続きからボタンがはみ出ても画面内に収まるようにする */}
-        <div className="w-full flex flex-col gap-3" style={{ paddingLeft: '64px' }}>
+        {/* カードリストは左にスペース確保して続きからボタンがはみ出ても画面内に収まるようにする */}
+        <div className="w-full flex flex-col gap-3 md:gap-4" style={{ paddingLeft: 'var(--home-card-pl)' }}>
         {DIFFICULTIES.map((d, i) => {
           const color = DIFFICULTY_COLORS[d];
           const stars = DIFFICULTY_STARS[d];
@@ -171,10 +171,10 @@ function HomeScreen() {
                   className="absolute flex flex-col items-center justify-center gap-1 rounded-xl
                     font-semibold transition-all active:scale-95 hover:brightness-110"
                   style={{
-                    left: '-60px',
+                    left: 'var(--home-continue-left)',
                     top: 0,
                     bottom: 0,
-                    width: '54px',
+                    width: 'var(--home-continue-w)',
                     background: t.actionCardBg,
                     border: `1px solid ${color}50`,
                     color: t.continueTextColor,
@@ -198,7 +198,7 @@ function HomeScreen() {
               <button
                 onClick={() => newGame(d)}
                 disabled={isGenerating || showContinue}
-                className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl
+                className="w-full flex items-center gap-4 px-5 py-4 md:px-7 md:py-5 rounded-2xl
                   transition-all duration-200
                   disabled:cursor-not-allowed"
                 style={{
@@ -224,10 +224,10 @@ function HomeScreen() {
                     style={{ background: color, boxShadow: `0 0 8px ${color}` }}
                   />
                   <div className="text-left min-w-0">
-                    <div className="font-bold" style={{ fontSize: 'clamp(14px, 3.5vw, 16px)', color: t.cardTextColor }}>
+                    <div className="font-bold" style={{ fontSize: 'var(--home-card-name-fs)', color: t.cardTextColor }}>
                       {DIFFICULTY_LABELS[d]}
                     </div>
-                    <div className="truncate" style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', color: t.cardDescColor }}>
+                    <div className="truncate" style={{ fontSize: 'var(--home-card-desc-fs)', color: t.cardDescColor }}>
                       {DIFFICULTY_DESC[d]}
                     </div>
                   </div>
@@ -238,7 +238,7 @@ function HomeScreen() {
                   {Array.from({ length: 5 }).map((_, si) => (
                     <span
                       key={si}
-                      style={{ color: si < stars ? color : t.cardStarEmpty, fontSize: '14px' }}
+                      style={{ color: si < stars ? color : t.cardStarEmpty, fontSize: 'var(--home-star-fs)' }}
                     >
                       ★
                     </span>
@@ -265,16 +265,16 @@ function HomeScreen() {
       )}
 
       {/* 統計ボタン */}
-      <div className="flex w-full max-w-sm">
+      <div className="flex w-full" style={{ maxWidth: 'var(--home-max-w)' }}>
         <button
           onClick={() => setShowStats(true)}
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl
+          className="flex-1 flex items-center justify-center gap-2 py-3 md:py-4 rounded-xl
             font-semibold transition-all active:scale-95 hover:brightness-110"
           style={{
             background: t.actionCardBg,
             border: `1px solid ${t.actionBorder}`,
             color: t.actionTextColor,
-            fontSize: 'clamp(12px, 3vw, 14px)',
+            fontSize: 'var(--home-stats-fs)',
           }}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -366,7 +366,7 @@ function GameScreen() {
       </header>
 
       {/* コンテンツ */}
-      <div className="w-full max-w-lg px-3 flex flex-col items-center gap-4 mt-3">
+      <div className="w-full max-w-lg md:max-w-2xl px-3 flex flex-col items-center gap-4 mt-3">
 
         {/* 難易度バッジ + タイマー（同一行・タイマー中央） */}
         <div className="w-full relative flex items-center px-1">

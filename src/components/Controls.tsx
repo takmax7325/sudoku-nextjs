@@ -181,13 +181,13 @@ function ControlButton({
         color: active ? activeColor : gt.controlText,
         background: active ? `${activeColor}15` : gt.controlBg,
         border: `1px solid ${active ? `${activeColor}40` : gt.controlBorder}`,
-        minWidth: '52px',
+        minWidth: 'var(--control-min-w)',
         transition: 'background 0.2s ease, color 0.2s ease',
       }}
       aria-label={label}
     >
       {icon}
-      <span style={{ fontSize: 'clamp(9px, 2vw, 11px)' }}>{label}</span>
+      <span style={{ fontSize: 'var(--control-font)' }}>{label}</span>
     </button>
   );
 }

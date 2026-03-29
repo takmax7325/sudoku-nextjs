@@ -157,8 +157,8 @@ const Cell = React.memo(function Cell({
         active:scale-95
       `}
       style={{
-        width: 'clamp(32px, 10vw, 56px)',
-        height: 'clamp(32px, 10vw, 56px)',
+        width: 'var(--cell-size)',
+        height: 'var(--cell-size)',
         background: bg,
         borderRight,
         borderBottom,
@@ -187,7 +187,7 @@ const Cell = React.memo(function Cell({
             ${cell.isGiven ? 'font-extrabold' : 'animate-pop'}
           `}
           style={{
-            fontSize: 'clamp(14px, 4vw, 22px)',
+            fontSize: 'calc(var(--cell-size) * 0.52)',
             color: textColor,
           }}
         >
@@ -216,7 +216,7 @@ function PencilMarks({ marks, color }: { marks: Set<number>; color: string }) {
         <div
           key={n}
           className="flex items-center justify-center"
-          style={{ fontSize: 'clamp(6px, 1.8vw, 9px)', color, lineHeight: 1 }}
+          style={{ fontSize: 'calc(var(--cell-size) * 0.22)', color, lineHeight: 1 }}
         >
           {marks.has(n) ? n : ''}
         </div>

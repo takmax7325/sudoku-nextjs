@@ -37,32 +37,7 @@ export default function HintPanel() {
 
   return (
     <div className="w-full">
-      {!currentHint ? (
-        <button
-          onClick={requestHint}
-          disabled={isComplete || isGenerating}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl
-            transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed
-            hover:brightness-110 font-semibold"
-          style={{
-            background: 'linear-gradient(135deg, #3730a3, #7c3aed)',
-            color: '#fff',
-            border: '1px solid rgba(167,139,250,0.3)',
-            fontSize: 'clamp(13px, 3.5vw, 15px)',
-          }}
-        >
-          <LightbulbIcon />
-          ヒントを見る
-          {hintCount > 0 && (
-            <span
-              className="ml-1 px-2 py-0.5 rounded-full text-xs"
-              style={{ background: 'rgba(255,255,255,0.2)' }}
-            >
-              ×{hintCount}
-            </span>
-          )}
-        </button>
-      ) : (
+      {currentHint ? (
         <div
           className="w-full rounded-xl p-4 animate-fade-in"
           style={{

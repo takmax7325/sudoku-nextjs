@@ -18,15 +18,15 @@
 
   /* ── ホーム画面スケーリング ── */
   --home-max-w: min(calc(100vw - 2rem), 384px);
-  --home-title-fs: clamp(36px, 10vw, 56px);
-  --home-label-fs: 0.75rem;
+  --home-title-fs: clamp(44px, 12vw, 64px);
+  --home-label-fs: clamp(0.8rem, 2.5vw, 0.9rem);
   --home-card-pl: 64px;
   --home-continue-left: -60px;
   --home-continue-w: 54px;
-  --home-card-name-fs: clamp(14px, 3.5vw, 16px);
-  --home-card-desc-fs: clamp(10px, 2.5vw, 12px);
-  --home-star-fs: 14px;
-  --home-stats-fs: clamp(12px, 3vw, 14px);
+  --home-card-name-fs: clamp(16px, 4.5vw, 18px);
+  --home-card-desc-fs: clamp(12px, 3vw, 13px);
+  --home-star-fs: clamp(16px, 4vw, 18px);
+  --home-stats-fs: clamp(14px, 3.5vw, 16px);
 }
 
 /* sm以上: gap を広げる */
@@ -40,7 +40,7 @@
 @media (min-width: 768px) {
   :root {
     /* ゲーム画面 */
-    --grid-size: min(calc(100vw - 4rem), 580px);
+    --grid-size: min(calc(100vw - 4rem), 640px);
     --numpad-btn-w: calc((var(--grid-size) - var(--numpad-gap) * 8) / 9);
     --numpad-btn-h: calc(var(--numpad-btn-w) * 1.38);
     --numpad-font: calc(var(--numpad-btn-w) * 0.5);

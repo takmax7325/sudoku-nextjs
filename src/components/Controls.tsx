@@ -17,16 +17,9 @@ export default function Controls() {
     togglePencilMode,
     undo,
     redo,
-    eraseCell,
     historyIndex,
     history,
-    difficulty,
     resetPuzzle,
-    newGame,
-    isGenerating,
-    hintCount,
-    setShowStats,
-    setShowDifficultyPicker,
     theme,
   } = useGameStore();
   const gt = GAME_THEME[theme];
@@ -77,72 +70,6 @@ export default function Controls() {
         />
       </div>
 
-      {/* 下段: 新しいゲーム / 消去 / 統計 */}
-      <div className="flex items-center justify-center gap-2">
-        {/* 難易度 + 新規ゲーム */}
-        <button
-          onClick={() => setShowDifficultyPicker(true)}
-          disabled={isGenerating}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold
-            transition-all active:scale-95 hover:brightness-105 disabled:opacity-50"
-          style={{
-            background: theme === 'dark'
-              ? 'linear-gradient(135deg, #0f172a, #1e293b)'
-              : `${DIFFICULTY_COLORS[difficulty]}10`,
-            border: `1px solid ${DIFFICULTY_COLORS[difficulty]}60`,
-            color: DIFFICULTY_COLORS[difficulty],
-            fontSize: 'clamp(12px, 3vw, 14px)',
-            transition: 'background 0.2s ease',
-          }}
-        >
-          {isGenerating ? (
-            <span className="flex items-center gap-2">
-              <SpinIcon />
-              生成中...
-            </span>
-          ) : (
-            <>
-              <span>{DIFFICULTY_LABELS[difficulty]}</span>
-              <span className="opacity-60">▼</span>
-            </>
-          )}
-        </button>
-
-        {/* 消去 */}
-        <button
-          onClick={eraseCell}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold
-            transition-all active:scale-95 hover:brightness-105"
-          style={{
-            background: gt.actionBg,
-            border: `1px solid ${gt.actionBorder}`,
-            color: gt.actionText,
-            fontSize: 'clamp(12px, 3vw, 14px)',
-            transition: 'background 0.2s ease, color 0.2s ease',
-          }}
-          aria-label="消去"
-        >
-          <EraseIcon />
-          消去
-        </button>
-
-        {/* 統計 */}
-        <button
-          onClick={() => setShowStats(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold
-            transition-all active:scale-95 hover:brightness-105"
-          style={{
-            background: gt.actionBg,
-            border: `1px solid ${gt.actionBorder}`,
-            color: gt.actionText,
-            fontSize: 'clamp(12px, 3vw, 14px)',
-            transition: 'background 0.2s ease, color 0.2s ease',
-          }}
-        >
-          <StatsIcon />
-          統計
-        </button>
-      </div>
     </div>
   );
 }

@@ -297,7 +297,11 @@ function HomeScreen() {
 
 function GameScreen() {
   const game = useGame();
-  const { difficulty, isGenerating, goHome, theme, toggleTheme } = useGameStore();
+  const {
+    difficulty, isGenerating, goHome, theme, toggleTheme,
+    eraseCell, setShowStats, setShowDifficultyPicker,
+    requestHint, hintCount, isComplete,
+  } = useGameStore();
   const gt = GAME_THEME[theme];
 
   const getCellHighlight = useCallback(
@@ -337,10 +341,102 @@ function GameScreen() {
           </svg>
         </button>
 
+        {/* 中央: 難易度・消去・統計 */}
+        <div className="flex items-center gap-1.5 ml-2">
+          {/* 難易度ピッカー */}
+          <button
+            onClick={() => setShowDifficultyPicker(true)}
+            disabled={isGenerating}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold
+              transition-all active:scale-95 hover:brightness-105 disabled:opacity-50"
+            style={{
+              background: theme === 'dark' ? 'linear-gradient(135deg, #0f172a, #1e293b)' : `${DIFFICULTY_COLORS[difficulty]}10`,
+              border: `1px solid ${DIFFICULTY_COLORS[difficulty]}60`,
+              color: DIFFICULTY_COLORS[difficulty],
+              fontSize: '13px',
+            }}
+          >
+            {isGenerating ? (
+              <svg className="animate-spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+            ) : (
+              <>
+                <span>{DIFFICULTY_LABELS[difficulty]}</span>
+                <span className="opacity-60 text-xs">▼</span>
+              </>
+            )}
+          </button>
+
+          {/* 消去 */}
+          <button
+            onClick={eraseCell}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold
+              transition-all active:scale-95 hover:brightness-105"
+            style={{
+              background: gt.controlBg,
+              border: `1px solid ${gt.controlBorder}`,
+              color: gt.actionText,
+              fontSize: '13px',
+            }}
+            aria-label="消去"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 20H7L3 16l10-10 7 7-2.5 2.5" /><path d="M6.0001 17.0001L17 6" />
+            </svg>
+            消去
+          </button>
+
+          {/* 統計 */}
+          <button
+            onClick={() => setShowStats(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold
+              transition-all active:scale-95 hover:brightness-105"
+            style={{
+              background: gt.controlBg,
+              border: `1px solid ${gt.controlBorder}`,
+              color: gt.actionText,
+              fontSize: '13px',
+            }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+            統計
+          </button>
+        </div>
+
+        {/* ヒントボタン（電球アイコンのみ） */}
+        <button
+          onClick={requestHint}
+          disabled={isComplete || isGenerating}
+          className="ml-auto relative flex items-center justify-center w-9 h-9 rounded-full
+            transition-all active:scale-95 hover:brightness-110 disabled:opacity-40"
+          style={{
+            background: gt.controlBg,
+            border: `1px solid ${gt.controlBorder}`,
+            color: '#a78bfa',
+          }}
+          aria-label="ヒントを見る"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 21h6M12 3a7 7 0 0 1 4.47 12.5c-.58.56-1.47 1.5-1.47 2.5H9c0-1-.89-1.94-1.47-2.5A7 7 0 0 1 12 3z" />
+          </svg>
+          {hintCount > 0 && (
+            <span
+              className="absolute -top-1 -right-1 flex items-center justify-center
+                w-4 h-4 rounded-full text-white font-bold"
+              style={{ fontSize: '9px', background: '#7c3aed', lineHeight: 1 }}
+            >
+              {hintCount}
+            </span>
+          )}
+        </button>
+
         {/* テーマ切替ボタン（右端） */}
         <button
           onClick={toggleTheme}
-          className="ml-auto flex items-center justify-center w-9 h-9 rounded-full
+          className="ml-2 flex items-center justify-center w-9 h-9 rounded-full
             transition-all active:scale-95 hover:brightness-110"
           style={{
             background: gt.controlBg,

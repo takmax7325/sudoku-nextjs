@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useGame } from '@/hooks/useGame';
 import { useGameStore } from '@/store/gameStore';
 import SudokuGrid from '@/components/SudokuGrid';
@@ -19,7 +19,17 @@ import type { Difficulty } from '@/lib/types';
 import { GAME_THEME } from '@/lib/theme';
 
 export default function HomePage() {
+  const [mounted, setMounted] = useState(false);
   const { screen } = useGameStore();
+
+  useEffect(() => { setMounted(true); }, []);
+
+  // SSRとクライアントのハイドレーション不一致を防ぐ。
+  // savedGames / theme などlocalStorageに依存した値はサーバーでは
+  // 空の初期値になるため、マウント前は何も描画しない。
+  if (!mounted) {
+    return <div style={{ background: '#0f172a', minHeight: '100vh' }} />;
+  }
 
   return screen === 'home' ? <HomeScreen /> : <GameScreen />;
 }
